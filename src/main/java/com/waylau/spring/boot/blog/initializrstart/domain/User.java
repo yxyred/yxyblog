@@ -23,7 +23,10 @@ public class User implements Serializable {
 	private String name;
 	@Column(nullable = false)
 	private int age;
-
+	@Column(nullable = false,unique=true)
+	private String username;
+	@Column(nullable = false)
+	private String password; // 登录时密码
 	protected User() {
 	}
 

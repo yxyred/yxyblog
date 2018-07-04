@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header::header}">
     <meta charset="UTF-8">
     <title>yxy</title>
 </head>
 <body>
-<p>小莹我爱你</p>
+<div class="container-fluid">
+    <p>love pxy forever</p>
+</div>
+<div th :replace="~{fragments/footer::foot}"></div>
 </body>
 </html>
