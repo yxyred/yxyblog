@@ -1,26 +1,49 @@
 package com.waylau.spring.boot.blog.initializrstart.config;
 
+import com.waylau.spring.boot.blog.initializrstart.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String KEY = "yxy";
-    @Autowired
-    private UserDetailsService userDetailsService;
 
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+   @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    /*@Bean
+    public static NoOpPasswordEncoder passwordEncoder() {
+        return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+    }*/
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();   // 使用 BCrypt 加密
+    }
+    /*@Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder( passwordEncoder());
+    }*/
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder( passwordEncoder); // 设置密码加密方式
+        return authenticationProvider;
+    }
     @Override
     protected void configure(HttpSecurity http) throws Exception{
        /* http.authorizeRequests().antMatchers("/css/**", "/js/**", "/fonts/**", "/index").permitAll() // 都可以访问
@@ -33,17 +56,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().exceptionHandling().accessDeniedPage("/403");  // 处理异常，拒绝访问就重定向到 403 页面*/
         /*http.csrf().ignoringAntMatchers("/h2-console/**"); // 禁用 H2 控制台的 CSRF 防护
         http.headers().frameOptions().sameOrigin(); // 允许来自同一来源的H2 控制台的请求*/
-        http.authorizeRequests()
-                .anyRequest().authenticated()
-                .and().formLogin().loginPage("/login").failureUrl("/login?error").permitAll().and()
-                .logout().permitAll();
+        http.authorizeRequests().antMatchers("/css/**", "/js/**", "/fonts/**", "/index").permitAll()
+               // .antMatchers("/h2-console/**").permitAll()
+                .and().formLogin().loginPage("/login").failureUrl("/login?error");
+        //http.csrf().ignoringAntMatchers("/h2-console/**");
+        //http.headers().frameOptions().sameOrigin();
     }
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws  Exception{
-        /*auth.jdbcAuthentication()
-                .withUser("yxy").password("123456").roles("ADMIN");*/
+       /* auth.inMemoryAuthentication()
+               .withUser("yxy").password("123456").roles("ADMIN");*/
+        //auth.userDetailsService(userDetailsService);
         auth.userDetailsService(userDetailsService);
-
-
+        auth.authenticationProvider(authenticationProvider());
     }
 }

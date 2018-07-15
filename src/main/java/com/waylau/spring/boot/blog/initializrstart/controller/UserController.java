@@ -3,17 +3,13 @@ package com.waylau.spring.boot.blog.initializrstart.controller;
 import com.waylau.spring.boot.blog.initializrstart.domain.User;
 import com.waylau.spring.boot.blog.initializrstart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomCollectionEditor;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 /**
@@ -71,7 +67,7 @@ public class UserController {
 	 */
 	@GetMapping("/form")
 	public ModelAndView createForm(Model model) {
-		model.addAttribute("user",new User(null,0));
+		model.addAttribute("user",new User(null,null,null,null));
 		model.addAttribute("title", "创建用户");
 		return new ModelAndView("users/form", "userModel", model);
 	}
@@ -79,6 +75,8 @@ public class UserController {
 	/**
 	 * 新建用户
 	 * @param user
+     *
+     *
 	 * @return
 	 */
 	@PostMapping

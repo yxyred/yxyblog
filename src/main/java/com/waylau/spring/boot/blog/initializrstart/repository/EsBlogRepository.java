@@ -4,6 +4,7 @@ import com.waylau.spring.boot.blog.initializrstart.domain.EsBlog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface EsBlogRepository extends ElasticsearchRepository<EsBlog,String> {
